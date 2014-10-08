@@ -1,21 +1,25 @@
 //
-//  TweetsViewController.swift
+//  ProfileViewController.swift
 //  TwitterRedux
 //
-//  Created by Faith Cox on 10/4/14.
+//  Created by Faith Cox on 10/7/14.
 //  Copyright (c) 2014 Yahoo. All rights reserved.
 //
 
 import UIKit
 
-class TweetsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class ProfileViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var tweets: [Tweet]?
     var user: User?
     
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var userImage: UIImageView!
-    @IBOutlet weak var userLabel: UILabel!
+    @IBOutlet weak var profileImage: UIImageView!
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var screennameLabel: UILabel!
+    @IBOutlet weak var tweetcountLabel: UILabel!
+    @IBOutlet weak var followcountLabel: UILabel!
+    @IBOutlet weak var friendscountLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,29 +28,19 @@ class TweetsViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.estimatedRowHeight = 75
         tableView.rowHeight = UITableViewAutomaticDimension
         
-        self.tableView.reloadData()
-        
+        TwitterClient.sharedInstance.userTimeLineWithParams(nil, completion: { (tweets, error) -> () in
+            self.tweets = tweets
+            self.tableView.reloadData()
+        })
+
         // Do any additional setup after loading the view.
-        NSNotificationCenter.defaultCenter().addObserverForName("showTweetInfo", object: nil, queue: nil) { (notification: NSNotification!) -> Void in
-            TwitterClient.sharedInstance.homeTimeLineWithParams(nil, completion: { (tweets, error) -> () in
-                //println("Timeline: \(tweets)")
-                self.tweets = tweets
-                self.tableView.reloadData()
-            })
-        }
-        
-        NSNotificationCenter.defaultCenter().addObserverForName("showMentionInfo", object: nil, queue: nil) { (notification: NSNotification!) -> Void in
-            TwitterClient.sharedInstance.mentionTimeLineWithParams(nil, completion: { (tweets, error) -> () in
-                //println("Mention: \(tweets)")
-                self.tweets = tweets
-                self.tableView.reloadData()
-            })
-            
-        }
-        
         var userURL = User.currentUser!.profileImageUrl!
-        userImage.setImageWithURL(NSURL(string: userURL))
-        userLabel.text = User.currentUser!.name
+        profileImage.setImageWithURL(NSURL(string: userURL))
+        nameLabel.text = User.currentUser!.name
+        screennameLabel.text = "@ \(User.currentUser!.screenname!)"
+        tweetcountLabel.text = "\(User.currentUser!.statuses_count!) tweets"
+        followcountLabel.text = "\(User.currentUser!.followers_count!) followers"
+        friendscountLabel.text = "\(User.currentUser!.friends_count!) friends"
     }
 
     override func didReceiveMemoryWarning() {
@@ -59,12 +53,13 @@ class TweetsViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCellWithIdentifier("TweetCell") as TweetCell
+        var cell = tableView.dequeueReusableCellWithIdentifier("UserCell") as UserCell
         var tweet = self.tweets?[indexPath.row]
-        println("tweet: \(tweet)")
+        //println("tweet: \(tweet)")
         cell.tweet = tweet
         return cell
     }
+    
 
     /*
     // MARK: - Navigation

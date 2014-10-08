@@ -29,11 +29,39 @@ class TwitterClient: BDBOAuth1RequestOperationManager {
         completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
             GET("1.1/statuses/home_timeline.json" ,
                 parameters: params, success: { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
-                    println("timeline : \(response)")
+                    //println("timeline : \(response)")
                     var tweets = Tweet.tweetsWithArray(response as [NSDictionary])
                     completion(tweets: tweets, error: nil)
                 }, failure: { (operation: AFHTTPRequestOperation!, error: NSError!) -> Void in
                     println("error getting timeline")
+                    //self.loginCompletion? (user: nil, error: error)
+                    completion(tweets: nil, error: error)
+            })
+    }
+    
+    func mentionTimeLineWithParams(params: NSDictionary?,
+        completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
+            GET("/1.1/statuses/mentions_timeline.json" ,
+                parameters: params, success: { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
+                    //println("mentiontimeline : \(response)")
+                    var tweets = Tweet.tweetsWithArray(response as [NSDictionary])
+                    completion(tweets: tweets, error: nil)
+                }, failure: { (operation: AFHTTPRequestOperation!, error: NSError!) -> Void in
+                    println("error getting mentions timeline")
+                    //self.loginCompletion? (user: nil, error: error)
+                    completion(tweets: nil, error: error)
+            })
+    }
+    
+    func userTimeLineWithParams(params: NSDictionary?,
+        completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
+            GET("/1.1/statuses/user_timeline.json" ,
+                parameters: params, success: { (operation: AFHTTPRequestOperation!, response: AnyObject!) -> Void in
+                    println("Usertimeline : \(response)")
+                    var tweets = Tweet.tweetsWithArray(response as [NSDictionary])
+                    completion(tweets: tweets, error: nil)
+                }, failure: { (operation: AFHTTPRequestOperation!, error: NSError!) -> Void in
+                    println("error getting mentions timeline")
                     //self.loginCompletion? (user: nil, error: error)
                     completion(tweets: nil, error: error)
             })
